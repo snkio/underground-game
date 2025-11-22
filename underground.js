@@ -150,8 +150,7 @@ function intro() {
 					return
 				} else {
 					console.log("Вы как всегда подходите к своему дому дергаете ручку, закрыто")
-					achivments.locked_door.unlocked = true
-					console.log("\x1b[33m Вы разблокировали достижение: «Дом вас не принял» \x1b[0m")
+					unlockAchivment(2)
 					console.log("Из-за двери шепот - вы должны помочь деревне...")
 					console.log()
 					console.log("Вы бежите к деревне..")
@@ -270,8 +269,7 @@ function intro() {
 				}
 				if (player.hp <= 0) {
 					console.log(`\x1b[1; 32m Вы погибли... \x1b[0m`)
-					achivments.died.unlocked = true
-					console.log("\x1b[33m Вы разблокировали достижение: «Погибнуть на поле боя» \x1b[0m")
+					unlockAchivment(4)
 					mainMenu()
 					return
 				}
@@ -314,8 +312,7 @@ function intro() {
 					console.log("Лорд Скелетов рухнул. Поселение спасено!")
 					console.log("Вы вернулись обратно в деревню - люди вам аплодируют!")
 					console.log("Вы - герой!")
-					achivments.theend.unlocked = true
-					console.log("\x1b[33m Вы разблокировали достижение: «Конец» \x1b[0m")
+					unlockAchivment(3)
 					mainMenu()
 					return
 				}
