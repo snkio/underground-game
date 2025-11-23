@@ -9,8 +9,8 @@ const achivments = [
 	{ name: "Безучастный", desc: "Вы ушли не взглянув назад. Тишина - ваш щит.", unlocked: false },
 	{ name: "Бросить деревню", desc: "Вы не хотели заморачиваться и просто ушли.", unlocked: false },
 	{ name: "Дом вас не принял", desc: "Попытаться уйти домой - но дверь закрыта. Пути назад нету.", unlocked: false },
-	{ name: "Конец", desc: "Вы победили главного босса.", unlocked: false },
-	{ name: "Вы погибли..", desc: "Погибнуть в бою. Деревня вас ждала как героя.. но герой не пришел.", unlocked: false }
+	{ name: "Вы погибли..", desc: "Погибнуть в бою. Деревня вас ждала как героя.. но герой не пришел.", unlocked: false },
+	{ name: "Конец", desc: "Вы победили главного босса.", unlocked: false }
 ]
 
 let currentEnemy = zombie
@@ -21,7 +21,15 @@ const rl = readline.createInterface({ input: process.stdin, output: process.stdo
 // АНЛОКИ И ТД
 
 function unlockAchivment(index) {
-	achivments[index].unlocked = true
+	const achu = achivments[index]
+
+	if (achu.unlocked) {
+		console.log()
+		console.log(`${achu.name} - уже разблокировано.`)
+		console.log()
+		return
+	}
+	achu.unlocked = true
 	console.log(`\x1b[33m✅ ${achivments[index].name} - разблокировано.\x1b[0m`)
 }
 
@@ -68,7 +76,7 @@ function mainMenu() {
 function resetGame() {
 	player.hp = 100
 	player.mana = 100
-	player.healthpotions = 100
+	player.healthpotions = 5
 	player.manapotions = 3
 
 	zombie.hp = 25
@@ -269,7 +277,7 @@ function intro() {
 				}
 				if (player.hp <= 0) {
 					console.log(`\x1b[1; 32m Вы погибли... \x1b[0m`)
-					unlockAchivment(4)
+					unlockAchivment(3)
 					mainMenu()
 					return
 				}
@@ -312,7 +320,7 @@ function intro() {
 					console.log("Лорд Скелетов рухнул. Поселение спасено!")
 					console.log("Вы вернулись обратно в деревню - люди вам аплодируют!")
 					console.log("Вы - герой!")
-					unlockAchivment(3)
+					unlockAchivment(4)
 					mainMenu()
 					return
 				}
