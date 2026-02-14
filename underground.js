@@ -15,7 +15,25 @@ const achivments = [
 	{ name: "Конец", desc: "Вы победили главного босса.", unlocked: false }
 ]
 
-let currentEnemy = training
+let coins = 0
+
+
+const checkEnemyHp = () => {
+	if (currentEnemy.hp <= 0) {
+		currentEnemy.hp = 0
+		return true
+	}
+	return false
+}
+
+const getCoin = (a) => {
+	if (checkEnemyHp()) {
+		coins += a
+		console.log(styleText('green', `Вы получили ${a} монет! Всего: ${coins}`))
+	}
+}
+
+const { styleText } = require('node:util');
 
 const readline = require("readline")
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
@@ -33,17 +51,18 @@ const unlockAchivment = (i) => {
 const showAch = () => {
 	achivments.forEach((ach, i) => {
 		const status = ach.unlocked ? '✅' : '🔒'
-		console.log(`${i + 1}. ${status} ${ach.name} - ${ach.desc}`)
+		console.log(styleText('yellow', `${i + 1}. ${status} ${ach.name} - ${ach.desc}`))
 	})
 }
 
 // ============
 
 const mainMenu = () => {
-	console.log("=== ИГРА ПУТНИК: ПОДЗЕМЕЛЬЕ ===")
-	console.log("1 - Начать новую игру")
-	console.log("2 - Достижения")
-	console.log("3 - Выйти\n")
+	console.log(styleText(['cyan', 'bold'], '=== ИГРА ПУТНИК: ПОДЗЕМЕЛЬЕ ==='));
+	console.log(styleText('blue', '1 - Начать новую игру'));
+	console.log(styleText('blue', '2 - Достижения'));
+	console.log(styleText('blue', '3 - Выйти\n'));
+
 
 	rl.question("Выберите ваше действие: ", (menu) => {
 		menu = menu.toLowerCase()
@@ -57,10 +76,10 @@ const mainMenu = () => {
 			console.log()
 			mainMenu()
 		} else if (menu === "3") {
-			console.log("До встречи путник..")
+			console.log(styleText('red', "До встречи путник.."))
 			rl.close()
 		} else {
-			console.log("Неверный выбор.")
+			console.log(styleText('red', "Неверный выбор."))
 			mainMenu()
 		}
 	})
@@ -105,7 +124,7 @@ function intro() {
 
 			setTimeout(afterRest, 3000)
 		} else {
-			console.log("Неизвестная команда. Попробуйте позже.")
+			console.log(styleText('red', 'Неизвестная команда. Попробуйте позже.'));
 			intro()
 		}
 	})
@@ -114,8 +133,6 @@ function intro() {
 		console.log("\nВы просыпаетесь оттого, что вас кто-то трясет")
 		console.log("Перед тем как вы пойдете в подземелье давайте вы поучитесь на маникене")
 		console.log("Главный смотрит на вас надежой - и страхом.\n")
-		// console.log("- Путник.. время пришло. Подземелье вас ждёт!")
-		// console.log("Ваше сердце колотиться. Вы чувствуете: «Я могу еще сбежать.. пока не поздно»\n")
 
 		rl.question("Ваши действия: (y - отточить свои навыки и пойти в подземелье, n - отвернуться и пойти домой): ", (goto) => {
 			goto = goto.toLowerCase()
@@ -156,8 +173,8 @@ function intro() {
 
 	// Основной геймплей
 	function training() {
-		console.log(`Ваше здоровье: ${player.hp} | Ваша мана: ${player.mana} | Зелий здоровья: ${player.healthpotions} | Зелий маны: ${player.manapotions} `)
-		console.log(`HP врага: ${currentEnemy.hp}\n`)
+		console.log(styleText('cyan', `Ваше здоровье: ${player.hp} | Ваша мана: ${player.mana} | Зелий здоровья: ${player.healthpotions} | Зелий маны: ${player.manapotions} `))
+		console.log(styleText('green', `HP врага: ${currentEnemy.hp}\n`))
 
 		rl.question("Действие (a - атака, s - лечиться, d - попытка побега, f - атака магией, q - восстановить ману): ", (ans) => {
 			ans = ans.toLowerCase()
@@ -167,8 +184,9 @@ function intro() {
 				currentEnemy.hp -= dmg
 				console.log(`\x1b[1; 32m Вы ударили ${currentEnemy.name} на ${dmg} урона! \x1b[0m`)
 
-				if (currentEnemy.hp <= 0) {
-					console.log(`\x1b[1; 32m ГОЙДА! Вы убили ${currentEnemy.name} ! \x1b[0m`)
+				if (checkEnemyHp()) {
+					console.log(styleText('green', `ГОЙДА! Вы убили ${currentEnemy.name}!`))
+					getCoin(1)
 					console.log(`Вы прошли обучение.`)
 					console.log(`- Путник вы достойны защищать нашу деревню вперед в подземелье!`)
 					unlockAchivment(3)
@@ -221,7 +239,8 @@ function intro() {
 	}
 
 	function turn() {
-		console.log(`Ваше здоровье: ${player.hp} | Ваша мана: ${player.mana} | Зелий здоровья: ${player.healthpotions} | Зелий маны: ${player.manapotions} `)
+		console.log(styleText('cyan', `Ваше здоровье: ${player.hp} | Ваша мана: ${player.mana} | Зелий здоровья: ${player.healthpotions} | Зелий маны: ${player.manapotions} `))
+		console.log(styleText('red', `Текущий враг: ${currentEnemy.name} `))
 		console.log(`HP врага: ${currentEnemy.hp}\n`)
 
 		rl.question("Действие (a - атака, s - лечиться, d - попытка побега, f - атака магией, q - восстановить ману): ", (ans) => {
@@ -328,8 +347,9 @@ function intro() {
 					return
 				}
 			}
-			if (currentEnemy.hp <= 0) {
-				console.log(`\x1b[1; 32m ГОЙДА! Вы убили ${currentEnemy.name} ! \x1b[0m`)
+			if (checkEnemyHp()) {
+				console.log(styleText('green', `ГОЙДА! Вы убили ${currentEnemy.name}!`))
+				getCoin(5)
 
 				if (currentEnemy.name === "Зомби") {
 					console.log("Вы спускаетесь дальше по коридору")
