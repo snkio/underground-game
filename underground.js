@@ -1,4 +1,13 @@
-let player = { name: "Путник", hp: 100, attack: 10, magic: 20, mana: 100, healthpotions: 5, manapotions: 3 }
+let player = {
+	name: "Путник",
+	hp: 100,
+	attack: 10,
+	magic: 20,
+	mana: 100, healthpotions: 5,
+	manapotions: 3,
+	coins: 0,
+	weaponPrice: 20,
+}
 let training = { name: "Манекен", hp: 50, attack: 0 }
 let zombie = { name: "Зомби", hp: 25, attack: 5 }
 let skeleton = { name: "Скелет", hp: 15, attack: 15 }
@@ -15,8 +24,7 @@ const achivments = [
 	{ name: "Конец", desc: "Вы победили главного босса.", unlocked: false }
 ]
 
-let coins = 0
-
+const { styleText } = require('node:util');
 
 const checkEnemyHp = () => {
 	if (currentEnemy.hp <= 0) {
@@ -28,12 +36,11 @@ const checkEnemyHp = () => {
 
 const getCoin = (a) => {
 	if (checkEnemyHp()) {
-		coins += a
-		console.log(styleText('green', `Вы получили ${a} монет! Всего: ${coins}`))
+		player.coins += a
+		console.log(styleText('green', `Вы получили ${a} монет! Всего: ${player.coins}`))
 	}
 }
 
-const { styleText } = require('node:util');
 
 const readline = require("readline")
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
@@ -90,6 +97,7 @@ function resetGame() {
 	player.mana = 100
 	player.healthpotions = 5
 	player.manapotions = 3
+	player.coins = 0
 
 	training.hp = 50
 	zombie.hp = 25
@@ -100,6 +108,7 @@ function resetGame() {
 
 	currentEnemy = training
 }
+
 
 function intro() {
 	console.log("Вы идёте по тихому лесу, Солнце скоро скроется за горами, птицы уже замолкли")
@@ -171,6 +180,46 @@ function intro() {
 		})
 	}
 
+	const buyWeapon = () => {
+		if (player.coins >= player.weaponPrice) {
+			player.coins -= player.weaponPrice
+
+			player.attack += 5
+
+			console.log('Успешно! Урон будет увеличен.')
+			return true
+		} else {
+			console.log(`Не хватает монет. Нужно: ${player.weaponPrice}`)
+			return false
+		}
+	}
+
+	const shop = () => {
+		console.log(styleText('blue', '1 - Купить новый меч (20 золота)'));
+		console.log(styleText('blue', '2 - Вернуться обратно в подземелье'));
+
+		rl.question("Выберите ваше действие: ", (theShop) => {
+			theShop = theShop.toLowerCase()
+
+			if (theShop === "1") {
+				if (buyWeapon) {
+					currentEnemy = warvor
+					console.log("Купив новый меч, вы идете обратно в подземелье\n");
+					turn()
+				} else {
+					shop()
+				}
+
+			} else if (theShop === "2") {
+				console.log("Идем обратно в подземелье\n");
+				turn()
+			} else {
+				console.log(styleText('red', "Неверный выбор."))
+				shop()
+			}
+		})
+	}
+
 	// Основной геймплей
 	function training() {
 		console.log(styleText('cyan', `Ваше здоровье: ${player.hp} | Ваша мана: ${player.mana} | Зелий здоровья: ${player.healthpotions} | Зелий маны: ${player.manapotions} `))
@@ -186,7 +235,7 @@ function intro() {
 
 				if (checkEnemyHp()) {
 					console.log(styleText('green', `ГОЙДА! Вы убили ${currentEnemy.name}!`))
-					getCoin(1)
+					getCoin(10)
 					console.log(`Вы прошли обучение.`)
 					console.log(`- Путник вы достойны защищать нашу деревню вперед в подземелье!`)
 					unlockAchivment(3)
@@ -349,7 +398,7 @@ function intro() {
 			}
 			if (checkEnemyHp()) {
 				console.log(styleText('green', `ГОЙДА! Вы убили ${currentEnemy.name}!`))
-				getCoin(5)
+				getCoin(10)
 
 				if (currentEnemy.name === "Зомби") {
 					console.log("Вы спускаетесь дальше по коридору")
@@ -362,8 +411,16 @@ function intro() {
 					console.log("Скелет упал и рассыпался в пыль")
 					console.log("Вы спускаетесь на второй этаж подземелья")
 					console.log("Спустившись на следующий этаж вы слышите тяжелые шаги - из комнаты вышел Варвор!")
-					currentEnemy = warvor
-					turn()
+
+
+					rl.question("Хотите зайти в магазин перед спуском на 2 этаж? (y/n) ", choice => {
+						if (choice.toLowerCase() === 'y') {
+							shop()
+						} else {
+							currentEnemy = warvor
+							turn()
+						}
+					})
 					return
 				}
 				else if (currentEnemy.name === "Варвор") {
